@@ -302,61 +302,49 @@ function MessageBubble({ msg, isSaved, onSave }: {
               </div>
             </div>
 
-            {nearestHospital ? (
-              <div className="flex flex-col gap-2 bg-white text-rose-950 p-3 rounded-xl font-sans shadow-sm">
-                <span className="text-[10px] uppercase tracking-wider text-rose-700 block">Nearest Hospital</span>
-                <div className="flex flex-col gap-1">
-                  <span className="font-extrabold text-sm">{nearestHospital.name}</span>
-                  <span className="text-[11px] text-rose-950/75 font-medium leading-relaxed">{nearestHospital.address}</span>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {nearestHospital.phone && (
-                      <a href={`tel:${nearestHospital.phone}`} className="rounded-lg bg-rose-600 px-2.5 py-1.5 text-[10px] font-extrabold text-white">
-                        Call hospital
-                      </a>
-                    )}
-                    {nearestHospital.maps_url && (
-                      <a href={nearestHospital.maps_url} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-rose-200 px-2.5 py-1.5 text-[10px] font-extrabold text-rose-700">
-                        Open map
-                      </a>
-                    )}
-                    {nearestHospital.distance_km != null && <span className="self-center text-[10px] text-rose-700">{nearestHospital.distance_km} km away</span>}
-                  </div>
-                </div>
+            {/* Hospital map actions — always rendered */}
+            <div className="flex flex-col gap-2 bg-white text-rose-950 p-3 rounded-xl font-sans shadow-sm">
+              <span className="text-[10px] uppercase tracking-wider text-rose-700 font-extrabold block">
+                Find Hospitals Near You
+              </span>
+              <span className="text-[11px] text-rose-900/70 font-medium leading-relaxed">
+                {referral?.nearest_hospital?.address ||
+                  "Allow location access and retry for a location-anchored search."}
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {/* Primary: open map view of nearby emergency hospitals */}
+                {referral?.nearest_hospital?.maps_url ? (
+                  <a
+                    href={referral.nearest_hospital.maps_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg bg-rose-600 px-3 py-1.5 text-[10px] font-extrabold text-white"
+                  >
+                    See hospitals near me
+                  </a>
+                ) : (
+                  <a
+                    href="https://www.google.com/maps/search/emergency+hospital+near+me"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg bg-rose-600 px-3 py-1.5 text-[10px] font-extrabold text-white"
+                  >
+                    Find hospitals on map
+                  </a>
+                )}
+                {/* Secondary: get directions to nearest hospital */}
+                {referral?.hospitals && referral.hospitals.length > 1 && referral.hospitals[1]?.maps_url && (
+                  <a
+                    href={referral.hospitals[1].maps_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-[10px] font-extrabold text-rose-700"
+                  >
+                    Get directions
+                  </a>
+                )}
               </div>
-            ) : (
-              <div className="flex flex-col gap-2 bg-rose-700/60 p-3 rounded-xl font-sans">
-                <span className="text-[10px] uppercase tracking-wider text-rose-100">Hospital Details Need Location</span>
-                <span className="text-[11px] font-medium text-rose-50 leading-relaxed">
-                  Allow browser location access and retry, or open maps to find emergency hospitals near you now.
-                </span>
-                <a href="https://www.google.com/maps/search/emergency+hospitals+near+me" target="_blank" rel="noopener noreferrer" className="w-fit rounded-lg bg-white px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide text-rose-700 shadow-sm">
-                  Find hospitals near me
-                </a>
-              </div>
-            )}
-
-            {nearbyHospitals.length > 0 && (
-              <div className="flex flex-col gap-2 bg-rose-700/50 p-3 rounded-xl font-sans">
-                <span className="text-[10px] uppercase tracking-wider text-rose-100 block">Other Nearby Hospitals</span>
-                <div className="flex flex-col gap-2">
-                  {nearbyHospitals.map((h: any, idx: number) => (
-                    <div key={`${h.name}-${idx}`} className="border-b border-rose-500/20 last:border-b-0 pb-2 last:pb-0 flex flex-col gap-1">
-                      <span className="font-extrabold text-[11px]">{h.name}</span>
-                      <span className="text-[10px] text-rose-100 font-normal">{h.address}</span>
-                      <div className="flex flex-wrap gap-2">
-                        {h.phone && <a href={`tel:${h.phone}`} className="text-[9px] text-white underline">Call</a>}
-                        {h.distance_km != null && <span className="text-[9px] text-rose-200">{h.distance_km} km</span>}
-                        {h.maps_url && (
-                          <a href={h.maps_url} target="_blank" rel="noopener noreferrer" className="text-[9px] text-white underline">
-                            Map
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
