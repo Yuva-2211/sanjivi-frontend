@@ -25,6 +25,7 @@ import {
   Check,
   X,
   Copy,
+  Printer,
 } from "lucide-react";
 import SanjiviLogo from "@/components/SanjiviLogo";
 import { useRouter } from "next/navigation";
@@ -129,6 +130,133 @@ function MessageBubble({ msg, isSaved, onSave }: {
     navigator.clipboard.writeText(msg.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handlePrintReport = () => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    
+    const title = msg.emergency ? "Emergency Medical Referral" : "Sanjivi AI Clinical Consultation Report";
+    const dateStr = new Date(msg.timestamp).toLocaleString();
+    
+    let contentHtml = `
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #1c1917; line-height: 1.6; }
+            .header { border-bottom: 2px solid #059669; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: 800; color: #065f46; margin: 0; }
+            .meta { font-size: 11px; color: #6b7280; margin-top: 5px; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: #047857; margin-bottom: 10px; border-left: 3px solid #059669; padding-left: 8px; }
+            .text { font-size: 13px; margin: 0 0 10px 0; }
+            .badge { display: inline-block; background-color: #ecfdf5; color: #065f46; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 5px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+            .card { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; background-color: #f9fafb; }
+            .card-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #374151; margin-bottom: 5px; }
+            .emergency-banner { background-color: #fef2f2; border: 1px solid #fee2e2; padding: 15px; border-radius: 8px; margin-bottom: 25px; color: #991b1b; }
+            .emergency-title { font-size: 16px; font-weight: 800; margin: 0 0 5px 0; }
+            @media print {
+              body { padding: 20px; }
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">Sanjivi AYUSH AI</div>
+            <div class="meta">Consultation Report &bull; Generated: ${dateStr}</div>
+          </div>
+    `;
+
+    if (msg.emergency) {
+      contentHtml += `
+        <div class="emergency-banner">
+          <div class="emergency-title">⚠️ EMERGENCY MEDICAL REFERRAL</div>
+          <p class="text">${msg.content}</p>
+        </div>
+      `;
+      if (nearestHospital) {
+        contentHtml += `
+          <div class="section">
+            <div class="section-title">Recommended Nearest Hospital</div>
+            <div class="card" style="background-color: #fff5f5; border-color: #fec2c2;">
+              <div class="card-title" style="color: #991b1b;">${nearestHospital.name}</div>
+              <p class="text"><strong>Address:</strong> ${nearestHospital.address}</p>
+              ${nearestHospital.phone ? `<p class="text"><strong>Phone:</strong> ${nearestHospital.phone}</p>` : ""}
+              ${nearestHospital.distance_km != null ? `<p class="text"><strong>Distance:</strong> ${nearestHospital.distance_km} km away</p>` : ""}
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      contentHtml += `
+        <div class="section">
+          <div class="section-title">Summary & Recommendation</div>
+          <p class="text" style="font-size: 14px; white-space: pre-line;">${msg.content}</p>
+        </div>
+      `;
+
+      // Add expert breakdowns
+      let breakdownHtml = "";
+      const systems = ["ayurveda", "siddha", "unani", "homeopathy", "yoga"];
+      systems.forEach(sysKey => {
+        const sysData = msg[sysKey];
+        if (sysData) {
+          const sysName = sysKey.charAt(0).toUpperCase() + sysKey.slice(1);
+          if (sysKey === "yoga") {
+            breakdownHtml += `
+              <div class="card">
+                <div class="card-title">${sysName} Session Details</div>
+                ${sysData.poses && sysData.poses.length > 0 ? `<p class="text"><strong>Poses:</strong> ${sysData.poses.join(", ")}</p>` : ""}
+                ${sysData.breathing_exercises && sysData.breathing_exercises.length > 0 ? `<p class="text"><strong>Breathing:</strong> ${sysData.breathing_exercises.join(", ")}</p>` : ""}
+                ${sysData.lifestyle ? `<p class="text"><strong>Lifestyle Plan:</strong> ${sysData.lifestyle}</p>` : ""}
+              </div>
+            `;
+          } else {
+            breakdownHtml += `
+              <div class="card">
+                <div class="card-title">${sysName} Consultation Details</div>
+                ${sysData.diagnosis ? `<p class="text"><strong>Assessment:</strong> ${sysData.diagnosis}</p>` : ""}
+                ${sysData.recommendations ? `<p class="text"><strong>Therapy:</strong> ${sysData.recommendations}</p>` : ""}
+                ${sysData.herbs_or_remedies && sysData.herbs_or_remedies.length > 0 ? `<p class="text"><strong>Remedies:</strong> ${sysData.herbs_or_remedies.join(", ")}</p>` : ""}
+                ${sysData.diet ? `<p class="text"><strong>Dietary Advice:</strong> ${sysData.diet}</p>` : ""}
+                ${sysData.lifestyle ? `<p class="text"><strong>Lifestyle Plan:</strong> ${sysData.lifestyle}</p>` : ""}
+              </div>
+            `;
+          }
+        }
+      });
+
+      if (breakdownHtml) {
+        contentHtml += `
+          <div class="section">
+            <div class="section-title">Detailed System-by-System AYUSH Breakdown</div>
+            <div class="grid">
+              ${breakdownHtml}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    contentHtml += `
+          <div style="margin-top: 50px; border-top: 1px solid #e5e7eb; padding-top: 10px; font-size: 10px; color: #9ca3af; text-align: center;">
+            Disclaimer: Sanjivi AI provides informational clinical guidance based on traditional AYUSH systems. This report is for educational purposes only and does not substitute for professional in-person medical diagnosis, advice, or treatment.
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(contentHtml);
+    printWindow.document.close();
   };
 
   const referral = msg.hospital_referral;
@@ -353,6 +481,13 @@ function MessageBubble({ msg, isSaved, onSave }: {
                     <span>Copy</span>
                   </>
                 )}
+              </button>
+              <button
+                onClick={handlePrintReport}
+                className="text-[10px] font-bold text-brand-muted hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <Printer className="w-3 h-3" />
+                <span>Print Report</span>
               </button>
               <button
                 onClick={() => setExpandedSystems(prev => !prev)}
