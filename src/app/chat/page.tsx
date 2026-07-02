@@ -202,7 +202,7 @@ function MessageBubble({ msg, isSaved, onSave }: {
       let breakdownHtml = "";
       const systems = ["ayurveda", "siddha", "unani", "homeopathy", "yoga"];
       systems.forEach(sysKey => {
-        const sysData = msg[sysKey];
+        const sysData = (msg as any)[sysKey];
         if (sysData) {
           const sysName = sysKey.charAt(0).toUpperCase() + sysKey.slice(1);
           if (sysKey === "yoga") {
