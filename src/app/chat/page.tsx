@@ -96,14 +96,61 @@ const SYSTEM_COLORS: Record<string, { bg: string; dot: string; text: string; ico
   Yoga:     { bg: "bg-orange-50",  dot: "bg-orange-500",  text: "text-orange-700",  icon: <Sun className="w-3 h-3" /> },
 };
 
+// Icons for the segmented mode picker (SVG paths)
+const MODE_ICONS: Record<string, React.ReactNode> = {
+  Auto: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+    </svg>
+  ),
+  Multisystem: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  ),
+  Ayurveda: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z" />
+      <path d="M12 22V12" /><path d="M12 12 8 8"/><path d="M12 12l4-4"/>
+    </svg>
+  ),
+  Siddha: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  ),
+  Unani: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22V2" /><path d="M5 9l7-7 7 7" />
+      <path d="M5 15h14" /><path d="M5 19h14" />
+    </svg>
+  ),
+  Homeopathy: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 2h4" /><path d="M12 14v-4" /><path d="M10 14h4" />
+      <path d="M9 22H7a2 2 0 0 1-2-2v-2.586a2 2 0 0 1 .586-1.414L9 12V8h6v4l3.414 3.414A2 2 0 0 1 19 16.828V18a2 2 0 0 1-2 2h-2" />
+    </svg>
+  ),
+  Yoga: (
+    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="4" r="1" />
+      <path d="M4 17l4-4 2.5 2.5L14 10l6 7" />
+      <path d="M9 12l-4 3" /><path d="M15 12l4 3" />
+    </svg>
+  ),
+};
+
 const CHAT_MODES = [
-  { value: "Auto", label: "🤖 Auto (Recommended)" },
-  { value: "Multisystem", label: "🌍 All AYUSH" },
-  { value: "Ayurveda", label: "🌿 Ayurveda" },
-  { value: "Siddha", label: "🌱 Siddha" },
-  { value: "Unani", label: "☪ Unani" },
-  { value: "Homeopathy", label: "💊 Homeopathy" },
-  { value: "Yoga", label: "🧘 Yoga" },
+  { value: "Auto",        label: "Auto",        sublabel: "Recommended" },
+  { value: "Multisystem", label: "All AYUSH",   sublabel: "All systems" },
+  { value: "Ayurveda",    label: "Ayurveda",    sublabel: "Vedic" },
+  { value: "Siddha",      label: "Siddha",      sublabel: "Tamil" },
+  { value: "Unani",       label: "Unani",       sublabel: "Greco" },
+  { value: "Homeopathy",  label: "Homeopathy",  sublabel: "Dilutions" },
+  { value: "Yoga",        label: "Yoga",        sublabel: "Practice" },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────
@@ -1287,22 +1334,40 @@ export default function ChatPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* SVG icon segmented mode picker */}
+            <div className="hidden sm:flex items-center rounded-xl border border-neutral-200 bg-neutral-50 p-0.5 gap-0.5" role="group" aria-label="Response mode">
+              {CHAT_MODES.map(mode => {
+                const isActive = selectedMode === mode.value;
+                return (
+                  <button
+                    key={mode.value}
+                    onClick={() => setSelectedMode(mode.value)}
+                    title={`${mode.label} — ${mode.sublabel}`}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? "bg-white shadow-sm text-primary border border-neutral-200/60"
+                        : "text-brand-muted hover:text-brand-text hover:bg-white/60"
+                    }`}
+                  >
+                    <span className={isActive ? "text-primary" : "text-brand-muted"}>
+                      {MODE_ICONS[mode.value]}
+                    </span>
+                    <span>{mode.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Mobile fallback select */}
             <select
               value={selectedMode}
               onChange={(e) => setSelectedMode(e.target.value)}
-              className="hidden sm:block px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-[10px] font-bold text-brand-muted focus:outline-none focus:border-primary transition-all cursor-pointer"
-              title="Choose response model"
+              className="sm:hidden px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-[10px] font-bold text-brand-muted focus:outline-none focus:border-primary transition-all cursor-pointer"
+              title="Choose response mode"
             >
               {CHAT_MODES.map(mode => (
                 <option key={mode.value} value={mode.value}>{mode.label}</option>
               ))}
             </select>
-            {/* System indicators */}
-            <div className="hidden sm:flex items-center gap-1">
-              {Object.entries(SYSTEM_COLORS).map(([sys, cfg]) => (
-                <div key={sys} title={sys} className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-              ))}
-            </div>
             <button
               onClick={handleNewChat}
               className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center shadow-sm transition-all hover:bg-[#1b5e20] cursor-pointer"
@@ -1354,23 +1419,6 @@ export default function ChatPage() {
             />
           ))}
 
-          {/* Typing indicator */}
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="bg-white border border-neutral-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
-                <div className="flex gap-1">
-                  {[0, 1, 2].map(i => (
-                    <div
-                      key={i}
-                      className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
-                      style={{ animationDelay: `${i * 0.15}s` }}
-                    />
-                  ))}
-                </div>
-                <span className="text-[10px] font-semibold text-brand-muted">Five systems analyzing…</span>
-              </div>
-            </div>
-          )}
           <div ref={messagesEndRef} />
         </div>
 
