@@ -97,12 +97,13 @@ const SYSTEM_COLORS: Record<string, { bg: string; dot: string; text: string; ico
 };
 
 const CHAT_MODES = [
-  { value: "Multisystem", label: "Multisystem" },
-  { value: "Ayurveda", label: "Ayurvedic" },
-  { value: "Yoga", label: "Yoga" },
-  { value: "Unani", label: "Unani" },
-  { value: "Siddha", label: "Siddha" },
-  { value: "Homeopathy", label: "Homeopathy" },
+  { value: "Auto", label: "🤖 Auto (Recommended)" },
+  { value: "Multisystem", label: "🌍 All AYUSH" },
+  { value: "Ayurveda", label: "🌿 Ayurveda" },
+  { value: "Siddha", label: "🌱 Siddha" },
+  { value: "Unani", label: "☪ Unani" },
+  { value: "Homeopathy", label: "💊 Homeopathy" },
+  { value: "Yoga", label: "🧘 Yoga" },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────
@@ -603,7 +604,7 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [systemFilter, setSystemFilter] = useState<string>("All");
-  const [selectedMode, setSelectedMode] = useState<string>("Multisystem");
+  const [selectedMode, setSelectedMode] = useState<string>("Auto");
   const [activeView, setActiveView] = useState<"chat" | "starred">("chat");
   const [isListening, setIsListening] = useState(false);
 
@@ -727,12 +728,16 @@ export default function ChatPage() {
   };
 
   const getSelectedSystems = () => (
-    selectedMode === "Multisystem" ? Object.keys(SYSTEM_COLORS) : [selectedMode]
+    (selectedMode === "Multisystem" || selectedMode === "Auto")
+      ? Object.keys(SYSTEM_COLORS)
+      : [selectedMode]
   );
 
-  const getAnalysisLabel = () => (
-    selectedMode === "Multisystem" ? "AYUSH systems" : selectedMode
-  );
+  const getAnalysisLabel = () => {
+    if (selectedMode === "Auto") return "relevant AYUSH experts";
+    if (selectedMode === "Multisystem") return "all AYUSH systems";
+    return selectedMode;
+  };
 
   const getCurrentPosition = () => new Promise<{ lat: number; lng: number } | null>((resolve) => {
     if (!navigator.geolocation) {
