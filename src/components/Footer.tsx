@@ -106,6 +106,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+        </div>
 
         {/* Styled Medical Disclaimer Banner */}
         <div className="mt-8 p-6 rounded-2xl bg-neutral-50 border border-neutral-200/60 text-left flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
