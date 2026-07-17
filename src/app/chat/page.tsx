@@ -317,9 +317,9 @@ function MessageBubble({ msg, isSaved, onSave }: {
   if (msg.role === "user") {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 15, x: 20 }}
-        animate={{ opacity: 1, y: 0, x: 0 }}
-        transition={{ type: "spring", stiffness: 150, damping: 20 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         className="flex justify-end w-full"
       >
         <div className="max-w-[85%] sm:max-w-[75%] bg-primary text-white px-4 py-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-sm">
@@ -331,9 +331,9 @@ function MessageBubble({ msg, isSaved, onSave }: {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15, x: -20 }}
-      animate={{ opacity: 1, y: 0, x: 0 }}
-      transition={{ type: "spring", stiffness: 150, damping: 20 }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className="flex justify-start w-full"
     >
       <div className="max-w-[92%] sm:max-w-[85%] flex flex-col gap-3">
@@ -544,29 +544,9 @@ function MessageBubble({ msg, isSaved, onSave }: {
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                   className="overflow-hidden border-t border-neutral-100"
                 >
-                  <motion.div
-                    variants={{
-                      hidden: { opacity: 0 },
-                      show: {
-                        opacity: 1,
-                        transition: {
-                          staggerChildren: 0.05,
-                        }
-                      }
-                    }}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-neutral-50/30"
-                  >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-neutral-50/30">
                     {Object.entries(SYSTEM_COLORS).map(([sys, cfg]) => (
-                      <motion.div
-                        variants={{
-                          hidden: { opacity: 0, y: 15, scale: 0.98 },
-                          show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 120, damping: 15 } }
-                        }}
-                        key={sys}
-                        className={`px-5 py-4 rounded-xl border border-neutral-200/40 shadow-sm transition-all duration-300 hover:shadow-md ${cfg.bg}`}
-                      >
+                      <div key={sys} className={`px-5 py-4 rounded-xl border border-neutral-200/40 shadow-sm transition-all duration-300 hover:shadow-md ${cfg.bg}`}>
                         <div className="flex items-center gap-2 mb-1.5">
                           <span className={`w-2.5 h-2.5 rounded-full ${cfg.dot}`} />
                           <span className={`text-xs md:text-sm font-extrabold uppercase tracking-wider ${cfg.text}`}>{sys}</span>
@@ -647,9 +627,9 @@ function MessageBubble({ msg, isSaved, onSave }: {
                             </div>
                           )}
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1326,26 +1306,6 @@ export default function ChatPage() {
                   </div>
                 ) : null
               )}
-            </div>
-
-            {/* Sidebar Disclaimer Box */}
-            <div className="p-4 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
-              <div className="flex gap-2 items-start text-left">
-                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-extrabold uppercase tracking-wider text-amber-800">Medical Disclaimer</span>
-                  <p className="text-[10px] text-brand-muted leading-relaxed">
-                    Sanjivi AI provides educational info based on traditional AYUSH systems. Not a substitute for professional care.
-                  </p>
-                  <a
-                    href="/ayush-disclaimers"
-                    target="_blank"
-                    className="text-[9px] font-extrabold text-primary hover:underline mt-1 inline-block"
-                  >
-                    Read Full Disclaimers →
-                  </a>
-                </div>
-              </div>
             </div>
           </motion.aside>
         )}

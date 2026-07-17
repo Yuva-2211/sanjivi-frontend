@@ -106,31 +106,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-        </div>
 
-        {/* Styled Medical Disclaimer Banner */}
-        <div className="mt-8 p-6 rounded-2xl bg-neutral-50 border border-neutral-200/60 text-left flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex gap-3 items-start max-w-4xl">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0 mt-0.5">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">Important Medical Disclaimer</span>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Sanjivi AI provides educational information referencing traditional systems of medicine (Ayurveda, Yoga, Siddha, Unani, Homeopathy). It is not a substitute for professional medical advice, clinical diagnosis, or emergency care. If you are experiencing medical emergency symptoms, please contact your local emergency services (112) immediately.
-              </p>
-            </div>
-          </div>
-          <a
-            href="/ayush-disclaimers"
-            className="px-4 py-2 border border-neutral-300 hover:border-primary text-brand-text hover:text-primary text-xs font-semibold rounded-full shadow-sm transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shrink-0 whitespace-nowrap cursor-pointer"
-          >
-            Learn More
-          </a>
         </div>
 
         {/* Divider */}
