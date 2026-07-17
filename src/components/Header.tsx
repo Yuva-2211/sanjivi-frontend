@@ -21,17 +21,19 @@ export default function Header() {
   const navItems = [
     { label: "Home", href: "#home" },
     { label: "Problem", href: "#problems" },
-    { label: "How It Works", href: "#agentic-flow" },
+    { label: "Disclaimers", href: "/ayush-disclaimers" },
     { label: "AYUSH Systems", href: "#ayush" },
     { label: "Safety First", href: "#safety-foundation" },
   ];
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
     setIsMobileMenuOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
